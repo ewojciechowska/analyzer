@@ -8,6 +8,7 @@ import time
 from pathlib import Path
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
+from watchdog.events import PatternMatchingEventHandler
 
 class OnWatch:
     # set the directory to watch
@@ -29,15 +30,12 @@ class OnWatch:
 
         self.observer.join()
 
-class MyHandler(FileSystemEventHandler):
+class MyHandler(PatternMatchingEventHandler):
+    def __init__(self):
+        PatternMatchingEventHandler.__init__(self, patterns = ['*.txt'], ignore_directories = True, case_sensitive = False)
 
-    @staticmethod
-    def on_any_event(event):
-        if event.is_directory:
-            return None
-
-        elif event.event_type == 'created':
-            print("Event occured: CREATED - % s." % event.src_path)
+    def on_created(self, event):
+        print("Event occured: CREATED - % s." % event.src_path)
 
 
 if __name__ == "__main__":
