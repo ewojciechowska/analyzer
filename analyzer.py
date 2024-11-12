@@ -5,10 +5,12 @@
 # Jeśli w drugim folderze pojawi się skopiowany plik, ma zostać automatycznie otwarty w notatniku.
 
 import time
+import mmap
 from pathlib import Path
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from watchdog.events import PatternMatchingEventHandler
+
 
 class OnWatch:
     # set the PATH to watch
@@ -38,14 +40,20 @@ class MyHandler(PatternMatchingEventHandler):
     # print info when defined file type created 
     def on_created(self, event):
         path = event.src_path
-        print("Event occured: CREATED - % s.", path)
+        print("Event occured: CREATED -", path)
         # search for MOCAP
         with open(path, 'r') as fp:
             for l_no, line in enumerate(fp):
                 if 'MOCAP' in line:
-                    print('MOCAP found in a file - % s.', path)
+                    print('MOCAP found in a file -', path)
                     print('Line number:', l_no)
                     break
+        #search for MOCAP in huge files
+        # with open(path,'rb',0) as file:
+        #     s = mmap.mmap(file.fileno(), 0, access = mmap.ACCESS_READ)
+        #     if s.find(b'MOCAP') != -1:
+        #         print("MOCAP exist in a file -", path)
+
        
         
 
