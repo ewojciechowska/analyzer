@@ -4,9 +4,10 @@
 # Jeżeli plik tekstowy, który pojawił się w folderze, zawiera w środku słowo MOCAP, skrypt powinien skopiować go do innego folderu.
 # Jeśli w drugim folderze pojawi się skopiowany plik, ma zostać automatycznie otwarty w notatniku.
 
+import os
 import time
-import mmap
 import shutil
+import subprocess as sp
 from pathlib import Path
 from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler
@@ -14,6 +15,7 @@ from prefect import task
 
 input_folder = Path(r"D:\Random_files_space\test_analyzer\input")
 output_folder = Path(r"D:\Random_files_space\test_analyzer\output")
+notepad_path = Path(r"C:\Windows\notepad.exe")
 
 class OnWatch():
     ## Set the PATH to watch
@@ -64,9 +66,11 @@ class MyHandler(PatternMatchingEventHandler):
                     ## Coppy a file to output directory 
                     shutil.copy(path, output_folder)
                     print ('Event occured: COPPIED TO -', output_folder)
+                    time.sleep(3)
 
                     ## Open coppied file in notepad
-
+                    file_path = os.path.join(output_folder, txt_file + ".")
+                    sp.call([notepad_path, file_path])
                     break     
 
 if __name__ == "__main__":
