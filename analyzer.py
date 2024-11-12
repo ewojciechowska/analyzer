@@ -6,15 +6,18 @@
 
 import time
 import mmap
+import shutil
 from pathlib import Path
 from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler
 from watchdog.events import PatternMatchingEventHandler
+from prefect import task
 
+input_folder = Path(r"D:\Random_files_space\test_analyzer\input")
+output_folder = Path(r"D:\Random_files_space\test_analyzer\output")
 
-class OnWatch:
-    # set the PATH to watch
-    watchDirectory = Path(r"D:\Random_files_space\test_analyzer")
+class OnWatch():
+    ## Set the PATH to watch
+    watchDirectory = input_folder
 
     def __init__(self):
         self.observer = Observer()
@@ -33,31 +36,39 @@ class OnWatch:
         self.observer.join()
 
 class MyHandler(PatternMatchingEventHandler):
-    # set the file type you want to observe for 
+    ## Set the file type you want to observe for 
     def __init__(self):
         PatternMatchingEventHandler.__init__(self, patterns = ['*.txt'], ignore_directories = True, case_sensitive = False)
 
-    # print info when defined file type created 
+    ## Print info when defined file type created 
     def on_created(self, event):
         path = event.src_path
+        txt_file = Path(path).name
+        print(f"Processing:", txt_file)
+        
         print("Event occured: CREATED -", path)
-        # search for MOCAP
+
+        ## Search for MOCAP
         with open(path, 'r') as fp:
             for l_no, line in enumerate(fp):
                 if 'MOCAP' in line:
                     print('MOCAP found in a file -', path)
-                    print('Line number:', l_no)
-                    break
-        #search for MOCAP in huge files
+                    # print('Line number:', l_no)
+
+        ## Search for MOCAP in huge files
         # with open(path,'rb',0) as file:
         #     s = mmap.mmap(file.fileno(), 0, access = mmap.ACCESS_READ)
         #     if s.find(b'MOCAP') != -1:
         #         print("MOCAP exist in a file -", path)
 
-       
-        
+                    ## Coppy a file to output directory 
+                    shutil.copy(path, output_folder)
+                    print ('Event occured: COPPIED TO -', output_folder)
+
+                    ## Open coppied file in notepad
+
+                    break     
 
 if __name__ == "__main__":
     watch = OnWatch()
     watch.run()
-
