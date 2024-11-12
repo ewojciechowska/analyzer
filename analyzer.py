@@ -11,7 +11,7 @@ from watchdog.events import FileSystemEventHandler
 from watchdog.events import PatternMatchingEventHandler
 
 class OnWatch:
-    # set the directory to watch
+    # set the PATH to watch
     watchDirectory = Path(r"D:\Random_files_space\test_analyzer")
 
     def __init__(self):
@@ -31,13 +31,25 @@ class OnWatch:
         self.observer.join()
 
 class MyHandler(PatternMatchingEventHandler):
+    # set the file type you want to observe for 
     def __init__(self):
         PatternMatchingEventHandler.__init__(self, patterns = ['*.txt'], ignore_directories = True, case_sensitive = False)
 
+    # print info when defined file type created 
     def on_created(self, event):
-        print("Event occured: CREATED - % s." % event.src_path)
-
+        path = event.src_path
+        print("Event occured: CREATED - % s.", path)
+        # search for MOCAP
+        with open(path, 'r') as fp:
+            for l_no, line in enumerate(fp):
+                if 'MOCAP' in line:
+                    print('MOCAP found in a file - % s.', path)
+                    print('Line number:', l_no)
+                    break
+       
+        
 
 if __name__ == "__main__":
     watch = OnWatch()
     watch.run()
+
